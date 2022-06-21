@@ -1,0 +1,2 @@
+database name : laravel_basic_4
+upload image : php artisan storage:link
