@@ -6,36 +6,37 @@
         @foreach($product as $value)
         <div class="form-group">
             <label for="menu">Tên sản phẩm </label>
-            <input type="text" name="name" class="form-control" value="{{$value->name}}" placeholder="Nhập san pham">
+            <input type="text" name="name" class="form-control" value="{{$value->name}}" placeholder="Nhập sản phẩm">
         </div>
 
         <div class="form-group">
             <label>Danh mục</label>
             <select class="form-control" name="menu_id">
-                @foreach($menus as $menu)
-                <option value="{{$menu->id}}" {{ $value->menu_id == $menu->id ? 'selected' : ''}}>{{$menu->name}}</option>
-                @endforeach
+                {!! \App\Helpers\Helper::listMenuProductEdit($menus,$value->menu_id) !!}
             </select>
         </div>
 
         <div class="form-group">
             <label>Mô tả </label>
-            <textarea name="description" class="form-control" placeholder="dien mo ta">{{$value->description}}</textarea>
+            <textarea name="description" class="form-control" placeholder="điền mô tả">{{$value->description}}</textarea>
         </div>
 
         <div class="form-group">
             <label>Mô tả chi tiết</label>
-            <textarea name="content" class="form-control" placeholder="chi tiet">{{$value->content}}</textarea>
+            <textarea name="content" class="form-control" placeholder="chi tiết">{{$value->content}}</textarea>
         </div>
         <div class="form-group">
             <label for="menu">Giá </label>
-            <input type="text" name="price" class="form-control" value="{{$value->price}}" placeholder="Nhập giá">
+            <input type="number" name="price" class="form-control" value="{{$value->price}}" placeholder="Nhập giá">
         </div>
         <div class="form-group">
             <label for="menu">Giá giảm </label>
-            <input type="text" name="price_sale" class="form-control" value="{{$value->price_sale}}" placeholder="Nhập giá giảm">
+            <input type="number" name="price_sale" class="form-control" value="{{$value->price_sale}}" placeholder="Nhập giá giảm">
         </div>
-
+        <div class="form-group">
+            <label for="menu">Tồn kho </label>
+            <input type="number" name="qty" class="form-control" value="{{$value->qty}}" placeholder="Nhập số lượng">
+        </div>
         <div class="form-group">
             <label for="menu">File input</label>
 
@@ -62,12 +63,16 @@
         <div class="form-group">
 
             <div class="custom-control custom-radio">
-                <input class="custom-control-input" value="1" type="radio" id="active" name="active" {{$value->active == 1 ? 'checked' : ''}}>
-                <label for="active" class="custom-control-label">Có</label>
+                <input class="custom-control-input" value="2" type="radio" id="active" name="active" {{$value->active == 2 ? 'checked' : ''}}>
+                <label for="active" class="custom-control-label">Approve</label>
             </div>
             <div class="custom-control custom-radio">
-                <input class="custom-control-input" value="0" type="radio" id="no_active" name="active" {{$value->active == 0 ? 'checked' : ''}}>
-                <label for="no_active" class="custom-control-label">Không</label>
+                <input class="custom-control-input" value="1" type="radio" id="no_active" name="active" {{$value->active == 1 ? 'checked' : ''}}>
+                <label for="no_active" class="custom-control-label">Pending</label>
+            </div>
+            <div class="custom-control custom-radio">
+                <input class="custom-control-input" value="0" type="radio" id="no_active_" name="active" {{$value->active == 0 ? 'checked' : ''}}>
+                <label for="no_active_" class="custom-control-label">Reject</label>
             </div>
         </div>
         @endforeach

@@ -6,7 +6,6 @@ use App\Http\Services\Menu\MenuService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Menu\CreateFormRequest;
 use Illuminate\Http\Request;
-use App\Models\Menu;
 use Illuminate\Support\Facades\DB;
 
 class MenuController extends Controller
@@ -22,18 +21,15 @@ class MenuController extends Controller
 
     public function create()
     {
-
         return view('admin.menu.add', [
             'title' => 'Thêm danh mục mới',
             'menus' => $this->menuService->getParent()
-
         ]);
     }
 
     public  function  store(CreateFormRequest $request)
     {
         $this->menuService->create($request);
-
         return redirect()->back();
     }
 
@@ -41,8 +37,6 @@ class MenuController extends Controller
     {
         return view('admin.menu.list', [
             'title' => 'Danh sách các danh mục',
-            // 'list' => $this->menuService->getList()
-            // 'list' => DB::table('menus')->get()
             'list' => $this->menuService->getAll()
         ]);
     }
@@ -50,66 +44,51 @@ class MenuController extends Controller
     public function destroy(Request $request)
     {
         $result = $this->menuService->destroy($request);
-
         if ($result) {
             return response()->json([
-                'error' => false,
-                'message' => 'Xóa danh mục thành công'
-
+                'code' => 200,
+                'message' => 'Xóa danh mục thành công.'
+            ]);
+        } else {
+            return response()->json([
+                'code' => 500,
+                'message' => 'Xóa danh mục không thành công.'
             ]);
         }
-
-        return response()->json([
-            'error' => true
-
-
-        ]);
-        // return dd($request);
-
-
     }
 
-    public function destroy1(Menu $menu)
+    public function editMenu($id)
     {
-
-        Menu::where('id', $menu->id)->delete();
-        return redirect()->back();
-    }
-
-
-    public function showedit(Menu $menu)
-    {
-        // return dd($menu);
-        return view('admin.menu.edit1', [
-            'title' => ' Chỉnh sửa danh mục: ' . $menu->name,
-            // 'menu' => DB::table('menus')->where('id',$menu->id)->get(),
-            'menu' => $menu,
-            'getParent' => $this->menuService->getParentLoc($menu),
-            'laythangchakhacdeoduoi' => DB::table('menus')->where('parent_id', 0)->Where([
-                ['id', '!=', $menu->parent_id]
-            ])->get(),
-            'laythangchadeselect' => DB::table('menus')->where('parent_id', 0)->Where('id', $menu->parent_id)->get(),
-            'layallcha' => $this->menuService->getParent()
+        $menu = DB::table('menus')->where('id', $id)->get();
+        // return dd($menu[0]->name);
+        return view('admin.menu.edit', [
+            'title' => ' Chỉnh sửa danh mục: ' . $menu[0]->name,
+            'menu' => $menu[0],
+            'getParent' => $this->menuService->getParentLoc($menu[0]),
         ]);
     }
-
-    public function updatedanhmuc(CreateFormRequest $request, Menu $menu)
+    public function updateMenu(CreateFormRequest $request, $id)
     {
-        $id = $menu->id;
-        $a = $this->menuService->updanhmuc($request, $id);
-        if ($a) {
+
+        $menu = DB::table('menus')->where('id', $id)->get();
+        $id = $menu[0]->id;
+        $result = $this->menuService->updateMenu($request, $id);
+        if ($result) {
             return redirect('admin/menus/list');
         }
-
         return redirect('admin/menus/edit/' . $menu->id);
     }
 
-    public function updateactive(Menu $menu)
+    public function updateActive($id)
     {
-        if ($menu->active == 1) {
-            Menu::where('id', $menu->id)->update(['active' => 0]);
+        $menu = DB::table('menus')->where('id', $id)->get();
+
+        if ($menu[0]->active == 1) {
+            DB::table('menus')->where('id', $menu[0]->id)
+                ->update(['active' => 0]);
         } else {
-            Menu::where('id', $menu->id)->update(['active' => 1]);
+            DB::table('menus')->where('id', $menu[0]->id)
+                ->update(['active' => 1]);
         }
         return redirect()->back();
     }

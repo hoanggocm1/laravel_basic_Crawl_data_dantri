@@ -4,7 +4,7 @@ namespace App\Http\Requests\Product;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class CreateFormRequestProduct extends FormRequest
+class UpdateFormRequestProduct extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -30,21 +30,21 @@ class CreateFormRequestProduct extends FormRequest
             'description' => 'required',
             'price' => 'required',
             'price_sale' => 'required',
-            'qty' => 'required',
+
             'content' => 'required'
         ];
     }
     public function messages(): array
     {
         return [
-            'name.required' => 'Vui lòng nhập tên sản phẩm',
-            'file.required' => 'Bắc buộc phải nhập hình ảnh',
+            'name.required' => 'Vui lòng nhập tên san pham',
+            'file.required' => 'Bac buoc phai nhap hinh anh',
             'menu_id.required' => 'Hiện tại không có danh mục nào hoạt động. Không thể thêm sản phẩm!',
-            'qty.required' => 'Vui lòng nhập tên sản phẩm',
-            'description.required' => 'Vui lòng nhập chi tiết ',
-            'price.required' => 'vui lòng nhập giá',
-            'price_sale.required' => 'vui lòng nhập giá',
-            'content.required' => 'vui lòng nhập mô tả',
+
+            'description.required' => 'Vui lòng nhập chi tiet ',
+            'price.required' => 'vui long nhap gia',
+            'price_sale.required' => 'vui long nhap gia giam',
+            'content.required' => 'Vui lòng nhập mo ta ',
         ];
     }
 }

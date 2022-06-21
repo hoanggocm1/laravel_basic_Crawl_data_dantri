@@ -2,25 +2,59 @@
 
 namespace App\Http\Services\Menu;
 
-use App\Models\Product;
-use App\Models\Menu;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Str;
 
 class MenuService
 {
     public function getParent()
     {
-        return Menu::where('parent_id', 0)->get();
+        return  DB::table('menus')->where('parent_id', 0)->get();
     }
-    public function getParentHome()
-    {
-        return Menu::select('id', 'name', 'parent_id')->where('active', 1)->where('parent_id', 0)->orderByDesc('id')->get();
-    }
+
+
+    // public function getMenus($list, $parent_id1 = 0, $char = '')
+    // {
+
+    //     $htmla = '';
+    //     $htmlc = '';
+    //     foreach ($list as $key => $value) {
+    //         if ($value->active == 1) {
+    //             $htmlc = '<label style="color: green;">On </label>';
+    //         } else {
+    //             $htmlc = '<label style="color: red;">Off </label>';
+    //         }
+
+    //         if ($value->parent_id == $parent_id1) {
+    //             $htmla .= '<tr>
+    //             <td>' . $char . $value->name . '</td>
+    //             <td>'  . $value->description . '</td>
+    //             <td>' . $value->content . '</td>
+    //             <td>' . $htmlc . '
+    //             <a href="/admin/menus/editactive/' . $value->id . '">  
+    //             <i class="fas fa-retweet" ></i>
+    //             </a></td>
+    //             <td> 
+    //                     <a class"btn btn-primary btn-sm" href="/admin/menus/edit/' . $value->id . '">
+    //                     <i class="fas fa-edit"></i>
+    //                     </a>
+    //                     <a class"btn btn-danger btn-sm" href="" onclick="removeRow(' . $value->id . ',\'/admin/menus/destroy\' ) ">
+
+    //                     <i class="fas fa-trash"></i>
+    //                     </a>
+    //             </td>
+    //             </tr>';
+    //             unset($list[$key]);
+
+    //             $htmla .= self::getMenus($list, $value->id, $char . ' ---- || ');
+    //         }
+    //     }
+    //     return dd(1);
+    // }
 
     public function getParentLoc($menu)
     {
-        return Menu::where([
+        return DB::table('menus')->where([
             ['parent_id', '==', '0'],
             ['id', '!=', $menu->id],
         ])->orderByDesc('id')->get();
@@ -28,25 +62,24 @@ class MenuService
 
     public function getList()
     {
-        return Menu::paginate(1);
+        return DB::table('menus')->paginate(1);
     }
 
     public function create($request)
     {
         try {
-            Menu::create([
-                'name' => (string) $request->input('name'),
-                'parent_id' => (int) $request->input('parent_id'),
-                'description' => (string) $request->input('description'),
-                'content' => (string) $request->input('content'),
-                'active' => (string) $request->input('active'),
-
-            ]);
+            DB::table('menus')
+                ->updateOrInsert([
+                    'name' => (string) $request->input('name'),
+                    'parent_id' => (int) $request->input('parent_id'),
+                    'description' => (string) $request->input('description'),
+                    'content' => (string) $request->input('content'),
+                    'active' => (string) $request->input('active'),
+                ]);
 
             session()->flash('success', 'Tạo danh mục thành công');
         } catch (\Exception $err) {
             session::flash('error', $err->getMessage());
-            //    session()->flash('error','Email hoặc mật khẩu không đúng');
             return false;
         }
         return true;
@@ -54,83 +87,32 @@ class MenuService
 
     public function getAll()
     {
-        return Menu::orderByDesc('id')->get();
+        return DB::table('menus')->get();
     }
 
     public function destroy($request)
     {
         $id = $request->input('id');
 
-        $menu = Menu::where('id', $id)->first();
+        $menu = DB::table('menus')->where('id', $id)->first();
         if ($menu) {
-            return Menu::where('id', $id)->orWhere('parent_id', $id)->delete();
+            return DB::table('menus')->where('id', $id)->orWhere('parent_id', $id)->delete();
         }
 
         return false;
     }
 
-    public function destroy1($menu)
+    public function updateMenu($request, $id)
     {
-        $id = $menu->input('id');
-
-        $menu1 = Menu::where('id', $id)->first();
-        if ($menu1) {
-            return Menu::where('id', $id)->orWhere('parent_id', $id)->delete();
-        }
-
-        return false;
-    }
-
-
-
-    public function updanhmuc($request, $id): bool
-    {
-
-
-        // Menu::updated([
-        //     'name'=>(string)$request->input('name'),
-        //     'parent_id'=>(int)$request->input('parent_id'),
-        //     'description'=>(string)$request->input('description'),
-        //     'content'=>(string)$request->input('content'),
-        //     'active'=> (int) $request->input('active')
-        // ]);
-
-        // Menu::create([
-        //     'name'=>(string) $request->input('name'),
-        //     'parent_id'=>(int) $request->input('parent_id'),
-        //     'description'=>(string) $request->input('description'),
-        //     'content'=>(string) $request->input('content'),
-        //     'active'=>(string) $request->input('active'),
-
-        // ]);
-
-        $data = Menu::find($id);
-        $data->name = $request->input('name');
-        $data->parent_id = $request->input('parent_id');
-        $data->description = $request->input('description');
-        $data->content = $request->input('content');
-        $data->active = $request->input('active');
-        $data->update();
-
-        Session::flash('success', 'Cap nhat thanh cong danh muc');
+        DB::table('menus')->where('id', $id)
+            ->update([
+                'name' => $request->input('name'),
+                'parent_id' => $request->input('parent_id'),
+                'description' => $request->input('description'),
+                'content' => $request->input('content'),
+                'active' => $request->input('active'),
+            ]);
+        Session::flash('success', 'Cập nhật danh mục thành công.');
         return true;
-    }
-
-    public function getId($id)
-    {
-
-        return  Menu::where('id', $id)->where('active', 1)->first();
-    }
-    public function getProduct($menu, $request)
-    {
-        // $a = $menu->products()->where('active', 1);
-
-        // return $a;
-
-        $a = Product::where('menu_id', $menu->id)->where('active', 1);
-        if ($request->input('price')) {
-            $a->orderBy('price', $request->input('price'));
-        }
-        return $a->orderByDesc('id')->paginate(8)->withQueryString();
     }
 }

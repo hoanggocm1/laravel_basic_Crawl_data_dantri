@@ -5,71 +5,23 @@ $.ajaxSetup({
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
     }
 });
-function aaaa(id,url){
-
-    if (confirm('xoa ma khong the khoi phuc?')){
-        $.ajax(
-            {
-                type:'DELETE',
-                datatype: 'JSON',
-                data: { id },
-                url: url,
-                success: function (result){
-                    if(result.error === false){
-                         alert(result.message);
-                        location.reload();
-                    }
-                    else{
-                    alert('xoa that bai roi nha 31');
-                }
-            }
-            }
-        )
-
-    }
-}
-
 
 //dang dung
-function removeRow(id,url){
-
+function removeMenu(id){
     if (confirm('Xóa danh mục, không thể khôi phục?')){
         $.ajax(
             {
                 type:'DELETE',
                 datatype: 'JSON',
                 data: { id },
-                url: url,
+                url: '/admin/menus/destroy',
                 success: function (result){
-                    if(result.error === false){
-                         alert(result.message);
-                        location.reload();
+                    if(result.code == 200){
+                        $('#listMenu_'+id).remove();
+                        alert(result.message);
                     }
                     else{
-                    alert('xoa that bai roi nha');
-                }
-            }
-            }
-        )
-
-    }
-}
-function remove(id,url){
-
-    if (confirm('xoa ma khong the khoi phuc?')){
-        $.ajax(
-            {
-                type:'DELETE',
-                datatype: 'JSON',
-                data: { id },
-                url: url,
-                success: function (result){
-                    if(result.error === false){
-                         alert(result.message);
-                        location.reload();
-                    }
-                    else{
-                    alert('xoa that bai roi nha 31');
+                        alert(result.message);
                 }
             }
             }
@@ -78,31 +30,6 @@ function remove(id,url){
     }
 }
 
-function removeHS1(id,url){
-    if (confirm('baaan dong y xoa hs nay?111')){
-        $.ajax(
-            {
-                type:'get',
-                datetype:'JSON',
-                data: {id},
-                url: url,
-                success: function(result){
-                  if(result){
-                      alert(result.message);
-                      location.reload();
-                  } else {
-                  alert('123');
-                    // location.reload();
-                // alert(sresult.message1);
-                // location.reload();
-                }
-            }
-    
-            }
-        
-         )
-        }
-    }
 
 function removeproduct(id,url){
     if(confirm('xoa hay khong')){
@@ -130,31 +57,6 @@ function removeproduct(id,url){
     }
 }
 
-function removeHS(id,url){
-if (confirm('ban dong y xoa hs nay?')){
-    $.ajax(
-        {
-            type:'get',
-            datetype:'JSON',
-            data: {id},
-            url: url,
-            success: function(result){
-              if(result.error === false){
-                  alert(result.message);
-                  location.reload();
-              } else {
-              alert(result.message1);
-                // location.reload();
-            // alert(sresult.message1);
-            // location.reload();
-            }
-        }
-
-        }
-    
-     )
-    }
-}
 
 //upload file
 
@@ -177,13 +79,6 @@ $('#uploadImageProduct').change(function(){
 
                 $('#image_change_name').html('<p style="float: left;"> Tên của hình ảnh sẽ được lưu thành:'+ '&ensp;' + ' <p  style="color:green; "> ' + result.url.name+ ' </p> </p>');
 
-
-           
-                // alert(result.url.name);
-                
-                // $('#uploadImageProduct').val(result.url.name);
-      
-         
             }
             else{
                 alert('Upload file lỗi!');
@@ -196,10 +91,9 @@ $('#uploadImageProduct').change(function(){
 
 
 
-/// up load nhieu image
+/// up load nhieu image tối đa 4
 $('#uploadImageProducts').change(function(){
   
-   
         const form = new FormData();
     form.append('files[]',$(this)[0].files[0]);
     form.append('files[]',$(this)[0].files[1]);
@@ -209,7 +103,6 @@ $('#uploadImageProducts').change(function(){
     // form.append('files[]',$(this)[0].files[5]);
 
     $.ajax({
-
         processData: false,
         contentType: false,
         type:'post',
@@ -228,27 +121,8 @@ $('#uploadImageProducts').change(function(){
                 '<input type="hidden" name="files'+i+'" value="'+result.url.fullUrl[i] +'" id="files'+i+'" >');
                
                 a[i] =   result.url.fullUrl[i];
-                
-           
-                // $('#images_change_name').html('<p style="float: left;"> Tên của hình ảnh sẽ được lưu thành:'+ '&ensp;' + ' <p  style="color:green; "> ' + result.url.name[i]+ ' </p> </p>');
-
-
-                // $('#uploadImageProducts').val(result.url.name[i]);
          
                 }
-               
-                // $('#image_show').html('<a href="' + result.url.fullUrl + '  " target="_blank" ><img src="' + result.url.fullUrl + '" width="100px"></a>');
-                // $('#file').val(result.url.fullUrl);
-
-                // $('#image_change_name').html('<p style="float: left;"> Tên của hình ảnh sẽ được lưu thành:'+ '&ensp;' + ' <p  style="color:green; "> ' + result.url.name+ ' </p> </p>');
-
-
-           
-                // alert(result.url.name);
-                
-                // $('#uploadImageProduct').val(result.url.name);
-      
-         
             }
             else{
                 alert('Upload file lỗi!');
@@ -256,71 +130,15 @@ $('#uploadImageProducts').change(function(){
         }
 
     });
-   
-
-  
-   
 });
-//----------------
-$('#uploadImageSlider').change(function(){
-    const formSlider = new FormData();
-   var a = formSlider.append('file',$(this)[0].files[0]);
-    $.ajax({
-        processData: false,
-        contentType: false,
-        type:'post',
-        dataType: 'JSON',
-        data: formSlider,
-        url: '/admin/upload/slider',
-        success: function (result){
-            if(result.error == false){
-                $('#image_show_slider').html('<a href="' + result.url.fullUrl + '  " target="_blank" ><img src="' + result.url.fullUrl + '" width="100px"></a>');
-                $('#file_slider').val(result.url.fullUrl);
-
-                $('#image_change_name_slider').html('<p style="float: left;"> Tên của hình ảnh sẽ được lưu thành:'+ '&ensp;' + ' <p  style="color:green; "> ' + result.url.name+ ' </p> </p>');
-               }
-            else{
-                alert('Upload file lỗi!');
-            }
-        }
-    });
-});
-
-$('#uploadAvatarAdmin').change(function(){
-    const formAvatarAdmin = new FormData();
-     var a = formAvatarAdmin.append('file',$(this)[0].files[0]);
-    $.ajax({
-        processData: false,
-        contentType: false,
-        type:'post',
-        dataType: 'JSON',
-        data: formAvatarAdmin,
-        url: '/admin/upload/avatarAdmin',
-        success: function (result){
-            if(result.error == false){
-                $('#image_show_avatarAdmin').html('<a href="' + result.url.fullUrl + '  " target="_blank" ><img src="' + result.url.fullUrl + '" width="100px"></a>');
-                $('#file_avatarAdmin').val(result.url.fullUrl);
-
-                $('#image_change_name_avataradmin').html('<p style="float: left;"> Tên của hình ảnh sẽ được lưu thành:'+ '&ensp;' + ' <p  style="color:green; "> ' + result.url.name+ ' </p> </p>');
-               }
-            else{
-                alert('Upload file lỗi!');
-            }
-        }
-    });
-});
-
 //-----------------------------------------------------------------------------------
 function updateActive(id,idActive){
-  
-
     const Active = document.getElementById(id).getAttribute("src");
-
     $.ajax({
         type:'post',
         dataType:'JSON',
         data:{ id, Active},
-        url: '/load-product1111/'+id+'/'+ Active,
+        url: 'update_ProductActive/'+id+'/'+Active,
         success:function(result){
            
         if(result.giatri == 0){
@@ -334,12 +152,7 @@ function updateActive(id,idActive){
             document.getElementById(id).textContent = 'Off';
             document.getElementById(id).setAttribute("src",0);
             document.getElementById(id).style.color = 'red';
-           
-            
         }
-
-        // location.reload();
-
         }
     })
    
@@ -347,25 +160,38 @@ function updateActive(id,idActive){
 }
 
 function deleteProduct(id){
-   
+ var check =  confirm('Xác nhận xóa sản phẩm?')
+if(check){
     $.ajax({
-        type:'post',
+        type:'DELETE',
         dataType:'JSON',
         data:{id},
-        url:'/delete-product/'+id,
+        url:'delete-product',
         success: function(result){
-           if(result){
-            location.reload();
+           if(result.code == 200){
+            $('#listProducts_'+result.id).remove();
+            if(result.status == 0){
+                let now = Number($('#count_Reject').text())
+                $('#count_Reject').text(now-1)
+               }else if(result.status == 1){
+                let now = Number($('#count_Pending').text())
+                $('#count_Pending').text(now-1)
+               }else{
+                let now = Number($('#count_Approve').text())
+                $('#count_Approve').text(now-1)
+               }
+              
+                alert(result.message)
+           }else{
+            alert(result.message)
            }
         }
     })
-
+}
 
 }
 
 function deleteImageProduct(id){
-
-
        check = confirm('Xóa hình ảnh này?')
         if(check){
             $.ajax({
@@ -401,3 +227,97 @@ function changeImageProduct(id){
     }
 }
 
+//tim product theo ten 
+$(document).on('keyup', '#search_product_byName', function() {
+    $('#gender').val('0')
+    var keyword_price = $('#search_product_byPrice').val();
+    if (keyword_price == '') {
+        var keyword_name = $('#search_product_byName').val();
+        $.ajax({
+            type: 'post',
+            dataType: 'JSON',
+            data: {
+                keyword_name
+            },
+            url: '/admin/products/search_product_byName',
+            success: function(result) {
+                $('#bodyListProduct').html(result.html);
+            }
+        })
+    } else {
+        var keyword_name = $('#search_product_byName').val();
+        $.ajax({
+            type: 'post',
+            dataType: 'JSON',
+            data: {
+                keyword_name,
+                keyword_price
+            },
+            url: '/admin/products/search_product_byNameAndPrice',
+            success: function(result) {
+                $('#bodyListProduct').html(result.html);
+            }
+        })
+    }
+});
+
+// tim theo gia Product
+$(document).on('keyup', '#search_product_byPrice', function() {
+    $('#gender').val('0')
+    var keyword_name = $('#search_product_byName').val();
+    if (keyword_name == '') {
+        var keyword_price = $('#search_product_byPrice').val();
+        $.ajax({
+            type: 'post',
+            dataType: 'JSON',
+            data: {
+                keyword_price
+            },
+            url: '/admin/products/search_product_byPrice',
+            success: function(result) {
+                $('#bodyListProduct').html(result.html);
+            }
+        })
+    } else {
+        var keyword_price = $('#search_product_byPrice').val();
+        $.ajax({
+            type: 'post',
+            dataType: 'JSON',
+            data: {
+                keyword_name,
+                keyword_price
+            },
+            url: '/admin/products/search_product_byNameAndPrice',
+            success: function(result) {
+                $('#bodyListProduct').html(result.html);
+            }
+        })
+    }
+});
+function refresh() {
+    $('#search_product_byName').val('')
+    $('#search_product_byPrice').val('')
+    $('#gender').val('0')
+    $.ajax({
+        type: 'post',
+        dataType: 'JSON',
+        url: '/admin/products/refresh_listProduct',
+        success: function(result) {
+            $('#bodyListProduct').html(result.html);
+        }
+    })
+}
+function filter(keyword){
+    // console.log(keyword)
+    $.ajax({
+        type: 'post',
+        dataType: 'JSON',
+        url: '/admin/products/filter',
+        data:{
+            keyword
+        },
+        success: function(result) {
+            $('#bodyListProduct').html(result.html);
+        }
+    })
+}

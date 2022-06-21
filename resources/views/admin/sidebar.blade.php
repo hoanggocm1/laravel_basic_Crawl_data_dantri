@@ -1,15 +1,3 @@
-<!-- Main Sidebar Container -->
-<?php
-
-use App\Models\InfoAdmin;
-use Illuminate\Support\Facades\Auth;
-
-$admin_inSidebar = Auth::user();
-$info_admin_inSidebar = InfoAdmin::where('user_id', $admin_inSidebar->id)->first();
-
-
-
-?>
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
     <a href="/admin" class="brand-link">
@@ -21,21 +9,9 @@ $info_admin_inSidebar = InfoAdmin::where('user_id', $admin_inSidebar->id)->first
     <div class="sidebar">
         <!-- Sidebar user (optional) -->
         <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-            <?php
-            if ($info_admin_inSidebar->avatar_admin != null) {
-            ?>
-                <div class="image">
-                    <img src="{{$info_admin_inSidebar->avatar_admin}}" class="img-circle elevation-2" alt="User Image">
-                </div>
-            <?php
-            } else {
-            ?>
-                <img src="{{Avatar::create($admin_inSidebar->name)->toBase64()}}" class="img-circle elevation-2" alt="User Image">
-            <?php
-            }
-            ?>
+
             <div class="info">
-                <a href="/admin/admin-info" class="d-block">{{$info_admin_inSidebar->full_name_admin == null ? $admin_inSidebar->name : $info_admin_inSidebar->full_name_admin}}</a>
+                <a href="/admin/admin-info" class="d-block"></a>
             </div>
         </div>
 
@@ -68,19 +44,6 @@ $info_admin_inSidebar = InfoAdmin::where('user_id', $admin_inSidebar->id)->first
                                 <p>Danh sách danh mục</p>
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a href="/admin/menus/addhocsinh" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Thêm học sinh</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="/admin/menus/listhocsinh" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Danh sách học sinh</p>
-                            </a>
-                        </li>
-
                     </ul>
                 </li>
 
@@ -111,59 +74,6 @@ $info_admin_inSidebar = InfoAdmin::where('user_id', $admin_inSidebar->id)->first
                     </ul>
                 </li>
 
-
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="nav-icon fas fa-bars"></i>
-                        <p>
-                            Slider
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="/admin/sliders/add" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Thêm slider</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="/admin/sliders/list" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Danh sách slider</p>
-                            </a>
-                        </li>
-
-                    </ul>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="nav-icon fas fa-bars"></i>
-                        <p>
-                            Đơn hàng
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="/admin/order/list" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Danh sách đơn hàng</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-
-
-
-
-
-
-
-
-
-            </ul>
-            </li>
 
             </ul>
         </nav>

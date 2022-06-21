@@ -4,15 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Services\Product\ProductService;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\Product\CreateFormRequestProduct;
-use App\Models\ImageProduct;
+use App\Http\Requests\Product\UpdateFormRequestProduct;
 use Illuminate\Http\Request;
-use App\Models\Menu;
-use App\Models\Product;
-use GuzzleHttp\Handler\Proxy;
-use Illuminate\Contracts\Session\Session;
-use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Facades\DB;
+
 
 class ProductController extends Controller
 {
@@ -24,47 +20,34 @@ class ProductController extends Controller
         $this->productService = $productService;
     }
 
-    public function addproduct()
+    public function addProduct()
     {
         return view('admin.product.add', [
             'title' => 'Thêm sản phẩm',
             'menus' => $this->productService->getMenuloc(),
-
         ]);
     }
 
     public function createproduct(CreateFormRequestProduct $request)
     {
-
         $result = $this->productService->ValidatePrice($request);
 
         if ($result) {
             $image =  $request->input('file');
 
             if ($image) {
-                // $fullimage = $image->getClientOriginalName();
-                // $truocimage = current(explode('.', $fullimage));
-                // $sauimage = $image->getClientOriginalExtension();
-                // $endimage =  $truocimage . rand(0, 99) . '.' . $sauimage;
-                // $image->move('uploads/products', $endimage);
-
-
-                $product =  Product::create([
-                    'name' => (string) $request->input('name'),
-                    'menu_id' => $request->input('menu_id'),
-                    'description' => (string) $request->input('description'),
-                    'content' => (string) $request->input('content'),
-                    'price' => (int)$request->input('price'),
-                    'price_sale' => (int)$request->input('price_sale'),
-                    'image' => (string)$image,
-                    'active' => (int)$request->input('active')
-                ]);
-            }
-            for ($i = 0; $i < $request->input('demImages'); $i++) {
-                ImageProduct::create([
-                    'id_product' => $product->id,
-                    'image_product' => $request->input('files' . $i),
-                ]);
+                $product = DB::table('products')
+                    ->updateOrInsert([
+                        'name' => (string) $request->input('name'),
+                        'menu_id' => $request->input('menu_id'),
+                        'description' => (string) $request->input('description'),
+                        'content' => (string) $request->input('content'),
+                        'qty' => (int)$request->input('qty'),
+                        'price' => (int)$request->input('price'),
+                        'price_sale' => (int)$request->input('price_sale'),
+                        'image' => (string)$image,
+                        'active' => (int)$request->input('active')
+                    ]);
             }
             session()->flash('success', 'Thêm sản phẩm thành công.');
             return redirect()->back();
@@ -73,170 +56,119 @@ class ProductController extends Controller
         return redirect()->back();
     }
 
-    public function createproduct1(Request $request)
+    public function listProduct()
     {
-
-        $image = $request->file('image');
-        if ($image) {
-            $fullimage = $image->getClientOriginalName();
-            $truocimage = current(explode('.', $fullimage));
-            $sauimage = $image->getClientOriginalExtension();
-            $endimage =  $truocimage . rand(0, 999) . '.' . $sauimage;
-            return dd($endimage);
+        $menus =  DB::table('menus')->get();
+        $products = $this->productService->getProduct();
+        $product_all = DB::table('products')->get();
+        $Reject = 0;
+        $Pending = 0;
+        $Approve = 0;
+        foreach ($product_all  as $product) {
+            if ($product->active == 0) {
+                $Reject++;
+            } elseif ($product->active == 1) {
+                $Pending++;
+            } else {
+                $Approve++;
+            }
         }
-    }
-
-    public function listproduct(Menu $menu)
-    {
         return view('admin.product.list', [
             'title' => ' Danh sách sản phẩm ',
-            'products' => $this->productService->getProduct($menu),
-            'menus' => Menu::orderByDesc('id')->get()
+            'products' => $products,
+            'Reject' => $Reject,
+            'Pending' => $Pending,
+            'Approve' => $Approve,
+            'menus' => $menus,
         ]);
     }
 
-    public function productactive(Product $product)
+    public function editProduct($id)
     {
-        if ($product->active == 1) {
-            Product::where('id', $product->id)->update(['active' => 0]);
-        } else {
-            Product::where('id', $product->id)->update(['active' => 1]);
-        }
-
-        return redirect()->back();
-    }
-
-    public function updateActivePRodcut()
-    {
-        // if ($product->active == 1) {
-        //     Product::where('id', $product->id)->update(['active' => 0]);
-        // } else {
-        //     Product::where('id', $product->id)->update(['active' => 1]);
-        // }
-        $result = true;
-        return dd($result);
-        // return response()->json(['check' => $result]);
-    }
-
-
-    public function deleteproduct(Product $product, Request $request)
-    {
-
-
-        $a =  Product::where('id', $product->id)->first();
-        $path = 'uploads/products/' . $a->image;
-        if ($a) {
-            if (file_exists($path)) {
-                // Storage::delete($path);
-                unlink($path);
-                // return dd($path);
-                $a->delete();
-                session()->flash('success', 'Xóa sản phẩm thành công');
-                return redirect()->back();
-            }
-            $a->delete();
-            session()->flash('success', 'Xóa sản phẩm thành công');
-            return redirect()->back();
-        }
-
-        // if ($a){
-        //     $b = str_replace('storage','public',$a->image);
-        //     Storage::delete($b);
-        //     $a->delete();
-
-        // }
-        //      return redirect()->back();
-        // return dd($path);
-        // $a->delete();
-        // return redirect()->back();
-
-
-    }
-
-    public function editproduct(Product $product)
-    {
-
+        $product_ =  DB::table('products')->where('id', $id)->get();
+        $product = $product_[0];
         return view('admin.product.editproduct', [
             'title' => 'Sửa thông tin sản phẩm' . $product->name,
-            'product' => Product::where('id', $product->id)->get(),
-
-            'menus' => Menu::where('active', 1)->where([
-                ['parent_id', '!=', '0']
-            ])->get(),
-
+            'product' => $product_,
+            'menus' => $this->productService->getMenuloc(),
         ]);
-        // $menus= $this->productService->getMenuloc();
-        // // $product1 = $product;
-        // return dd($menus);
     }
 
-    public function updateproduct(Request $request, Product $product)
+    public function updateProduct(Request $request, $id)
     {
-
         $image = $request->input('file');
-
+        $product = DB::table('products')->where('id', $id)->get();
         if ($image) {
-            // $fullimage = $image->getClientOriginalName();
-            // $truocimage = current(explode('.', $fullimage));
-            // $sauimage = $image->getClientOriginalExtension();
-            // $endimage =  $truocimage . rand(0, 99) . '.' . $sauimage;
-            // $image->move('uploads/products', $endimage);
 
-            // $truocimage = current(explode('.',$fullimage));
-            // $sauimage = $image->getClientOriginalExtension();
-            // $endimage =  $truocimage.rand(0,99).'.'.$sauimage;
-            // $image->move('uploads/products',$endimage);
+            DB::table('products')->where('id', $id)
+                ->update([
+                    'name' => $request->input('name'),
+                    'menu_id' => $request->input('menu_id'),
+                    'description' => $request->input('description'),
+                    'content' => $request->input('content'),
+                    'price' => $request->input('price'),
+                    'price_sale' => $request->input('price_sale'),
+                    'qty' => $request->input('qty'),
+                    'active' => $request->input('active'),
+                    'image' => $image,
 
-            Product::where('id', $product->id)->update([
-                'name' => $request->input('name'),
-                'menu_id' => $request->input('menu_id'),
-                'description' => $request->input('description'),
-                'content' => $request->input('content'),
-                'price' => $request->input('price'),
-                'price_sale' => $request->input('price_sale'),
-
-                'active' => $request->input('active'),
-                'image' => $image,
-
-            ]);
+                ]);
         } else {
-            Product::where('id', $product->id)->update([
-                'name' => $request->input('name'),
-                'menu_id' => $request->input('menu_id'),
-                'description' => $request->input('description'),
-                'content' => $request->input('content'),
-                'price' => $request->input('price'),
-                'price_sale' => $request->input('price_sale'),
-
-                'active' => $request->input('active'),
-                'image' => $product->image,
-            ]);
+            DB::table('products')->where('id', $id)
+                ->update([
+                    'name' => $request->input('name'),
+                    'menu_id' => $request->input('menu_id'),
+                    'description' => $request->input('description'),
+                    'content' => $request->input('content'),
+                    'price' => $request->input('price'),
+                    'price_sale' => $request->input('price_sale'),
+                    'qty' => $request->input('qty'),
+                    'active' => $request->input('active'),
+                    'image' => $product[0]->image,
+                ]);
         }
 
         return redirect('admin/products/list');
     }
 
-    public function deleteProductAjax($id)
+    public function deleteProductAjax(Request $request)
     {
-        $a =  Product::where('id', $id)->first();
-        $path = 'uploads/products/' . $a->image;
-        if ($a) {
-            if (file_exists($path)) {
-                // Storage::delete($path);
-                unlink($path);
-                // return dd($path);
-                $a->delete();
-                return response()->json(true);
-            }
-            $a->delete();
-            return response()->json(true);
-        }
-    }
 
-    public function editproductimage(Product $product)
+        $product_ =  DB::table('products')->where('id', $request->id)->get();
+        $product = $product_[0];
+        $path = 'uploads/products/' . $product->image;
+        if ($product) {
+            $status = $product->active;
+            if (file_exists($path)) {
+                unlink($path);
+                DB::table('products')->where('id', $request->id)->delete();
+                return response()->json([
+                    'code' => 200,
+                    'message' => 'Xóa sản phẩm thành công.',
+                    'id' => $request->id,
+                    'status' => $status
+                ]);
+            } else {
+                DB::table('products')->where('id', $request->id)->delete();
+                return response()->json([
+                    'code' => 200,
+                    'message' => 'Xóa sản phẩm thành công.',
+                    'id' => $request->id,
+                    'status' => $status
+                ]);
+            }
+        }
+        return response()->json([
+            'code' => 500,
+            'message' => 'Xóa sản phẩm thất bại!',
+        ]);
+    }
+    public function editProductImage($id)
     {
-        $imageProduct = $product->image;
-        $imageDetails = ImageProduct::where('id_product', $product->id)->get();
+        $product_ = DB::table('products')->where('id', $id)->get();
+        $product = $product_[0];
+        // $imageProduct = $product->image;
+        $imageDetails = DB::table('image_products')->where('id_product', $product->id)->get();
 
         return view('admin.product.editimage', [
             'title' => 'Sửa hình ảnh sản phẩm',
@@ -247,17 +179,16 @@ class ProductController extends Controller
     }
     public function deleteImageProductAjax($id)
     {
-        $result =  ImageProduct::where('id', $id)->delete();
+        DB::table('products')->where('id', $id)->delete();
         return response()->json([
             'id' => $id
         ]);
     }
-
     public function changeImageProductAjax(Request $request, $id)
     {
         $image = $request->input('nameImageProduct');
 
-        Product::where('id', $id)->update(['image' => $image]);
+        DB::table('products')->where('id', $id)->update(['image' => $image]);
         return response()->json([
             'image' => $image
         ]);
@@ -266,14 +197,202 @@ class ProductController extends Controller
 
     public function add_images_product(Request $request, $id)
     {
-
-
         for ($i = 0; $i < $request->input('demImages'); $i++) {
-            ImageProduct::create([
-                'id_product' => $id,
-                'image_product' => $request->input('files' . $i),
-            ]);
+            DB::table('image_products')
+                ->updateOrInsert([
+                    'id_product' => $id,
+                    'image_product' => $request->input('files' . $i),
+                ]);
         }
         return redirect()->back();
+    }
+
+    public function detailProduct($id)
+    {
+
+        $product = $this->productService->detailProduct($id);
+        $menu =  DB::table('menus')->where('id', $product->menu_id)->first();
+        $images = DB::table('image_products')->where('id_product', $product->id)->get();
+        return view('admin.product.detail', [
+            'title' => 'Chi tiết sản phẩm.',
+            'images' => $images,
+            'product' => $product,
+            'menu' => $menu,
+        ]);
+    }
+    public function search_product_byName(Request $request)
+    {
+        $products = DB::table('products')->where('name', 'LIKE', '%' . $request->keyword_name . '%')->get();
+
+        $html = '';
+        foreach ($products as $product) {
+            if ($product->active == 0) {
+                $htmlc = 'Reject';
+            } else if ($product->active == 1) {
+                $htmlc = 'Pending';
+            } else {
+                $htmlc = 'Approve';
+            }
+
+
+            $menu_name = DB::table('menus')->select('name')->where('id', $product->menu_id)->first();
+
+            $html .= '<tr id="account_' . $product->id . '">';
+            $html .= '<td>' . $product->name . '</td>';
+            $html .= '<td>' . $menu_name->name . '</td>';
+            $html .= '<td>' . $product->content . '</td>';
+            $html .= '<td>' . number_format($product->price, 0, ',', '.') . 'VNĐ</td>';
+            $html .= '<td>' . number_format($product->price_sale, 0, ',', '.') . 'VNĐ</td>';
+            $html .= '<td>' . $product->qty . '</td>';
+            $html .= '<td><img src="' . $product->image . '" width="100px" >
+            <a href="/admin/products/editProductImage/' . $product->id . '">Ảnh</a></td>';
+            $html .= '<td>' . $htmlc . '<a onclick="updateActive(' . $product->id . ',' . $product->active . ');">';
+            $html .= ' <i class="fas fa-retweet" style="color:blue; cursor: pointer;  align-items: center;" alt="' . $product->id . '"></i></a></td>';
+            $html .= '<td> <a class="btn btn-primary btn-sm" href="/admin/products/editProduct/' . $product->id . '"><i class="fas fa-edit"></i></a>';
+            $html .= '<a class="btn btn-danger btn-sm" style="color:blue; cursor: pointer;" onclick="deleteProduct(' . $product->id . ')">';
+            $html .= '<i id="hoverdi" class="fas fa-trash"></i>  </a>';
+            $html .= '<a class="btn btn-danger btn-sm" style="color:green; margin-top: 2px;" href="detailProduct/' . $product->id . '">Xem</a></td></tr>';
+        }
+        return  response()->json([
+            'html' => $html,
+        ]);
+    }
+    public function search_product_byPrice(Request $request)
+    {
+        $products = DB::table('products')->where('price', 'LIKE', '%' . $request->keyword_price . '%')->get();
+        $html = '';
+        foreach ($products as $product) {
+            if ($product->active == 0) {
+                $htmlc = 'Reject';
+            } else if ($product->active == 1) {
+                $htmlc = 'Pending';
+            } else {
+                $htmlc = 'Approve';
+            }
+
+            $menu_name = DB::table('menus')->select('name')->where('id', $product->menu_id)->first();
+            $html .= '<tr id="account_' . $product->id . '">';
+            $html .= '<td>' . $product->name . '</td>';
+            $html .= '<td>' . $menu_name->name . '</td>';
+            $html .= '<td>' . $product->content . '</td>';
+            $html .= '<td>' . number_format($product->price, 0, ',', '.') . 'VNĐ</td>';
+            $html .= '<td>' . number_format($product->price_sale, 0, ',', '.') . 'VNĐ</td>';
+            $html .= '<td>' . $product->qty . '</td>';
+            $html .= '<td><img src="' . $product->image . '" width="100px" >
+            <a href="/admin/products/editProductImage/' . $product->id . '">Ảnh</a></td>';
+            $html .= '<td>' . $htmlc . '<a onclick="updateActive(' . $product->id . ',' . $product->active . ');">';
+            $html .= ' <i class="fas fa-retweet" style="color:blue; cursor: pointer;  align-items: center;" alt="' . $product->id . '"></i></a></td>';
+            $html .= '<td> <a class="btn btn-primary btn-sm" href="/admin/products/editProduct/' . $product->id . '"><i class="fas fa-edit"></i></a>';
+            $html .= '<a class="btn btn-danger btn-sm" style="color:blue; cursor: pointer;" onclick="deleteProduct(' . $product->id . ')">';
+            $html .= '<i id="hoverdi" class="fas fa-trash"></i>  </a>';
+            $html .= '<a class="btn btn-danger btn-sm" style="color:green; margin-top: 2px;" href="detailProduct/' . $product->id . '">Xem</a></td></tr>';
+        }
+        return  response()->json([
+            'html' => $html,
+        ]);
+    }
+    public function search_product_byNameAndPrice(Request $request)
+    {
+        $products = DB::table('products')->where('name', 'LIKE', '%' . $request->keyword_name . '%')
+            ->where('price', 'LIKE', '%' . $request->keyword_price . '%')
+            ->get();
+
+        $html = '';
+        foreach ($products as $product) {
+            if ($product->active == 0) {
+                $htmlc = 'Reject';
+            } else if ($product->active == 1) {
+                $htmlc = 'Pending';
+            } else {
+                $htmlc = 'Approve';
+            }
+
+            $menu_name = DB::table('menus')->select('name')->where('id', $product->menu_id)->first();
+            $html .= '<tr id="account_' . $product->id . '">';
+            $html .= '<td>' . $product->name . '</td>';
+            $html .= '<td>' . $menu_name->name . '</td>';
+            $html .= '<td>' . $product->content . '</td>';
+            $html .= '<td>' . number_format($product->price, 0, ',', '.') . 'VNĐ</td>';
+            $html .= '<td>' . number_format($product->price_sale, 0, ',', '.') . 'VNĐ</td>';
+            $html .= '<td>' . $product->qty . '</td>';
+            $html .= '<td><img src="' . $product->image . '" width="100px" >
+            <a href="/admin/products/editProductImage/' . $product->id . '">Ảnh</a></td>';
+            $html .= '<td>' . $htmlc . '<a onclick="updateActive(' . $product->id . ',' . $product->active . ');">';
+            $html .= ' <i class="fas fa-retweet" style="color:blue; cursor: pointer;  align-items: center;" alt="' . $product->id . '"></i></a></td>';
+            $html .= '<td> <a class="btn btn-primary btn-sm" href="/admin/products/editProduct/' . $product->id . '"><i class="fas fa-edit"></i></a>';
+            $html .= '<a class="btn btn-danger btn-sm" style="color:blue; cursor: pointer;" onclick="deleteProduct(' . $product->id . ')">';
+            $html .= '<i id="hoverdi" class="fas fa-trash"></i>  </a>';
+            $html .= '<a class="btn btn-danger btn-sm" style="color:green; margin-top: 2px;" href="detailProduct/' . $product->id . '">Xem</a></td></tr>';
+        }
+        return  response()->json([
+            'html' => $html,
+        ]);
+    }
+
+    public function refresh_listProduct()
+    {
+        $products = DB::table('products')->orderBy('id', 'desc')->paginate(5);
+        $html = '';
+        foreach ($products as $product) {
+            if ($product->active == 0) {
+                $htmlc = 'Reject';
+            } else if ($product->active == 1) {
+                $htmlc = 'Pending';
+            } else {
+                $htmlc = 'Approve';
+            }
+            $menu_name = DB::table('menus')->select('name')->where('id', $product->menu_id)->first();
+            $html .= '<tr id="account_' . $product->id . '">';
+            $html .= '<td>' . $product->name . '</td>';
+            $html .= '<td>' . $menu_name->name . '</td>';
+            $html .= '<td>' . $product->content . '</td>';
+            $html .= '<td>' . number_format($product->price, 0, ',', '.') . ' VNĐ</td>';
+            $html .= '<td>' . number_format($product->price_sale, 0, ',', '.') . ' VNĐ</td>';
+            $html .= '<td>' . $product->qty . '</td>';
+            $html .= '<td><img src="' . $product->image . '" width="100px" >
+            <a href="/admin/products/editProductImage/' . $product->id . '">Ảnh</a></td>';
+            $html .= '<td>' . $htmlc . '</td>';
+            $html .= '<td> <a class="btn btn-primary btn-sm" href="/admin/products/editProduct/' . $product->id . '"><i class="fas fa-edit"></i></a>';
+            $html .= '<a class="btn btn-danger btn-sm" style="color:blue; cursor: pointer;" onclick="deleteProduct(' . $product->id . ')">';
+            $html .= '<i id="hoverdi" class="fas fa-trash"></i>  </a>';
+            $html .= '<a class="btn btn-danger btn-sm" style="color:green; margin-top: 2px;" href="detailProduct/' . $product->id . '">Xem</a></td></tr>';
+        }
+        return  response()->json([
+            'html' => $html,
+        ]);
+    }
+    public function filter(Request $request)
+    {
+
+
+        $products = DB::table('products')->where('active', $request->keyword)->paginate(5);
+        $html = '';
+        foreach ($products as $product) {
+            if ($product->active == 0) {
+                $htmlc = 'Reject';
+            } else if ($product->active == 1) {
+                $htmlc = 'Pending';
+            } else {
+                $htmlc = 'Approve';
+            }
+            $menu_name = DB::table('menus')->select('name')->where('id', $product->menu_id)->first();
+            $html .= '<tr id="listProducts_' . $product->id . '">';
+            $html .= '<td>' . $product->name . '</td>';
+            $html .= '<td>' . $menu_name->name . '</td>';
+            $html .= '<td>' . $product->content . '</td>';
+            $html .= '<td>' . number_format($product->price, 0, ',', '.') . ' VNĐ</td>';
+            $html .= '<td>' . number_format($product->price_sale, 0, ',', '.') . ' VNĐ</td>';
+            $html .= '<td>' . $product->qty . '</td>';
+            $html .= '<td><img src="' . $product->image . '" width="100px" >
+            <a href="/admin/products/editProductImage/' . $product->id . '">Ảnh</a></td>';
+            $html .= '<td>' . $htmlc . '</td>';
+            $html .= '<td> <a class="btn btn-primary btn-sm" href="/admin/products/editProduct/' . $product->id . '"><i class="fas fa-edit"></i></a>';
+            $html .= '<a class="btn btn-danger btn-sm" style="color:blue; cursor: pointer;" onclick="deleteProduct(' . $product->id . ')">';
+            $html .= '<i id="hoverdi" class="fas fa-trash"></i>  </a>';
+            $html .= '<a class="btn btn-danger btn-sm" style="color:green; margin-top: 2px;" href="detailProduct/' . $product->id . '">Xem</a></td></tr>';
+        }
+        return  response()->json([
+            'html' => $html,
+        ]);
     }
 }

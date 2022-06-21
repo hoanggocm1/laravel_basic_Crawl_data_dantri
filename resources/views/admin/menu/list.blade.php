@@ -1,11 +1,5 @@
 @extends('admin.main')
 @section('content')
-
-
-
-
-
-<!-- /.card-header -->
 <div class="card-body p-0">
   <div class="table-responsive">
     <table class="table m-0">
@@ -19,29 +13,9 @@
         </tr>
       </thead>
       <tbody>
-        <!-- @foreach ($list as $list1)
-                    <tr>
-                      <td>{{ $list1->name}}</td>
-                      <td>{{$list1->description}}</td>
-                      <td>{{$list1->content}}</td>
-                      <td>
-                        {{$list1->active}}
-                      </td>
-                    </tr>
-                        @endforeach -->
-
-        {!! \App\Helpers\Helper::menu1($list) !!}
+        {!! \App\Helpers\Helper::listMenu($list) !!}
       </tbody>
     </table>
-    <!-- <div class="card-tools">
-                  <ul class="pagination pagination-sm">
-                  
-            
-                  </ul>
-                </div> -->
-    <!-- /.table-responsive -->
-
-    <!-- /.card-body -->
   </div>
   <footer class="panel-footer">
     <div class="row">

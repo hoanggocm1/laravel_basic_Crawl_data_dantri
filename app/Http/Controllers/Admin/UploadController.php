@@ -32,7 +32,6 @@ class UploadController extends Controller
 
     public function stores(Request $request)
     {
-        // $images = $request->file('files');
 
         $url = $this->uploadService->stores($request);
 

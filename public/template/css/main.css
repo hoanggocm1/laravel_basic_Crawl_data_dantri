@@ -3591,4 +3591,7 @@ input.num-product::-webkit-inner-spin-button {
     .aaa {
         text-align: center;
     }
+    .delete_product_minicart{
+        color: yellow;
+    }
 }

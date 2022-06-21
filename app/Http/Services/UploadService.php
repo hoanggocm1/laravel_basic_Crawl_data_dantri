@@ -2,10 +2,6 @@
 
 namespace App\Http\Services;
 
-
-use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Str;
-
 class UploadService
 {
     public function store($request) //Ham này upload image product 
@@ -38,21 +34,9 @@ class UploadService
     {
 
 
-        // $images = $request->file('files');
-
-        // for ($i = 0; $i < $dem; $i++) {
-        //     $name = $images[$i]->getClientOriginalName();
-        // }
-        // return dd($name);
-        // foreach ($images as $key => $value) {
-        //     $name = $images[$key]->getClientOriginalName();
-        // }
-
-        // $name = $images[0];
-        // $a = $name->getClientOriginalName();
-
         if ($request->hasFile('files')) {
             try {
+
                 $images = $request->file('files');
                 $dem = count($images);
                 for ($i = 0; $i < $dem; $i++) {
@@ -71,12 +55,13 @@ class UploadService
                     );
                     $fullUrl[$i] = '/storage/' . $pathFull . '/' . $name[$i];
                 }
-
+                // return dd($fullUrl);
                 return ([
                     'fullUrl' => $fullUrl,
                     'name' => $name,
                     'dem' => $dem
                 ]);
+                return redirect()->back();
             } catch (\Exception $error) {
                 return false;
             }

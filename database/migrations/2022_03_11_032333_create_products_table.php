@@ -21,6 +21,7 @@ class CreateProductsTable extends Migration
             $table->integer('menu_id');
             $table->integer('price');
             $table->integer('price_sale');
+            $table->integer('qty');
             $table->string('image');
             $table->integer('active');
             $table->timestamps();
