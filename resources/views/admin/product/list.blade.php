@@ -41,7 +41,6 @@
             @foreach($products as $value)
             <tr id="listProducts_<?php echo $value->id ?>">
               <td> {{$value->name}} </td>
-
               @foreach($menus as $menu)
               <?php if ($value->menu_id == $menu->id) : ?>
                 <td>{{$menu->name}}</td>
@@ -55,7 +54,9 @@
               <td><a href="{{ $value->image  }}" target="_blank">
                   <img src="{{ $value->image  }}" alt="Product Image" height="100" width="100">
                 </a>
-                <a href="/admin/products/editProductImage/{{ $value->id }}">Ảnh</a>
+                <div>
+                  <a href="/admin/products/editProductImage/{{ $value->id }}">Sửa ảnh</a>
+                </div>
               </td>
               <td>
                 <?php if ($value->active == 0) : ?>
@@ -84,7 +85,7 @@
         </tbody>
       </table>
       <div class="card-tools">
-        <ul class="pagination pagination-sm">
+        <ul class="pagination pagination-sm" id="paginate_list_product">
           {!!$products->links()!!}
         </ul>
       </div>

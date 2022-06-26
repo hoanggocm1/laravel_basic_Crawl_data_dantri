@@ -304,11 +304,14 @@ function refresh() {
         url: '/admin/products/refresh_listProduct',
         success: function(result) {
             $('#bodyListProduct').html(result.html);
+            $('#paginate_list_product').css('display','block');
         }
     })
 }
 function filter(keyword){
     // console.log(keyword)
+    $('#search_product_byName').val('')
+    $('#search_product_byPrice').val('')
     $.ajax({
         type: 'post',
         dataType: 'JSON',
@@ -318,6 +321,7 @@ function filter(keyword){
         },
         success: function(result) {
             $('#bodyListProduct').html(result.html);
+            $('#paginate_list_product').css('display','none');
         }
     })
 }

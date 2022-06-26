@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Services\Product\ProductService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Product\CreateFormRequestProduct;
-use App\Http\Requests\Product\UpdateFormRequestProduct;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -22,6 +21,7 @@ class ProductController extends Controller
 
     public function addProduct()
     {
+
         return view('admin.product.add', [
             'title' => 'Thêm sản phẩm',
             'menus' => $this->productService->getMenuloc(),
@@ -244,10 +244,10 @@ class ProductController extends Controller
             $html .= '<td>' . number_format($product->price, 0, ',', '.') . 'VNĐ</td>';
             $html .= '<td>' . number_format($product->price_sale, 0, ',', '.') . 'VNĐ</td>';
             $html .= '<td>' . $product->qty . '</td>';
-            $html .= '<td><img src="' . $product->image . '" width="100px" >
-            <a href="/admin/products/editProductImage/' . $product->id . '">Ảnh</a></td>';
-            $html .= '<td>' . $htmlc . '<a onclick="updateActive(' . $product->id . ',' . $product->active . ');">';
-            $html .= ' <i class="fas fa-retweet" style="color:blue; cursor: pointer;  align-items: center;" alt="' . $product->id . '"></i></a></td>';
+            $html .= '<td><a href="' . $product->image  . '" target="_blank">
+            <img src="' . $product->image . '" width="100px" ></a><div>
+            <a href="/admin/products/editProductImage/' . $product->id . '">Sửa ảnh</a></div></td>';
+            $html .= '<td>' . $htmlc . '</td>';
             $html .= '<td> <a class="btn btn-primary btn-sm" href="/admin/products/editProduct/' . $product->id . '"><i class="fas fa-edit"></i></a>';
             $html .= '<a class="btn btn-danger btn-sm" style="color:blue; cursor: pointer;" onclick="deleteProduct(' . $product->id . ')">';
             $html .= '<i id="hoverdi" class="fas fa-trash"></i>  </a>';
@@ -278,10 +278,10 @@ class ProductController extends Controller
             $html .= '<td>' . number_format($product->price, 0, ',', '.') . 'VNĐ</td>';
             $html .= '<td>' . number_format($product->price_sale, 0, ',', '.') . 'VNĐ</td>';
             $html .= '<td>' . $product->qty . '</td>';
-            $html .= '<td><img src="' . $product->image . '" width="100px" >
-            <a href="/admin/products/editProductImage/' . $product->id . '">Ảnh</a></td>';
-            $html .= '<td>' . $htmlc . '<a onclick="updateActive(' . $product->id . ',' . $product->active . ');">';
-            $html .= ' <i class="fas fa-retweet" style="color:blue; cursor: pointer;  align-items: center;" alt="' . $product->id . '"></i></a></td>';
+            $html .= '<td><a href="' . $product->image  . '" target="_blank">
+            <img src="' . $product->image . '" width="100px" ></a><div>
+            <a href="/admin/products/editProductImage/' . $product->id . '">Sửa ảnh</a></div></td>';
+            $html .= '<td>' . $htmlc . '</td>';
             $html .= '<td> <a class="btn btn-primary btn-sm" href="/admin/products/editProduct/' . $product->id . '"><i class="fas fa-edit"></i></a>';
             $html .= '<a class="btn btn-danger btn-sm" style="color:blue; cursor: pointer;" onclick="deleteProduct(' . $product->id . ')">';
             $html .= '<i id="hoverdi" class="fas fa-trash"></i>  </a>';
@@ -315,10 +315,10 @@ class ProductController extends Controller
             $html .= '<td>' . number_format($product->price, 0, ',', '.') . 'VNĐ</td>';
             $html .= '<td>' . number_format($product->price_sale, 0, ',', '.') . 'VNĐ</td>';
             $html .= '<td>' . $product->qty . '</td>';
-            $html .= '<td><img src="' . $product->image . '" width="100px" >
-            <a href="/admin/products/editProductImage/' . $product->id . '">Ảnh</a></td>';
-            $html .= '<td>' . $htmlc . '<a onclick="updateActive(' . $product->id . ',' . $product->active . ');">';
-            $html .= ' <i class="fas fa-retweet" style="color:blue; cursor: pointer;  align-items: center;" alt="' . $product->id . '"></i></a></td>';
+            $html .= '<td><a href="' . $product->image  . '" target="_blank">
+            <img src="' . $product->image . '" width="100px" ></a><div>
+            <a href="/admin/products/editProductImage/' . $product->id . '">Sửa ảnh</a></div></td>';
+            $html .= '<td>' . $htmlc . '</td>';
             $html .= '<td> <a class="btn btn-primary btn-sm" href="/admin/products/editProduct/' . $product->id . '"><i class="fas fa-edit"></i></a>';
             $html .= '<a class="btn btn-danger btn-sm" style="color:blue; cursor: pointer;" onclick="deleteProduct(' . $product->id . ')">';
             $html .= '<i id="hoverdi" class="fas fa-trash"></i>  </a>';
@@ -331,7 +331,7 @@ class ProductController extends Controller
 
     public function refresh_listProduct()
     {
-        $products = DB::table('products')->orderBy('id', 'desc')->paginate(5);
+        $products = DB::table('products')->orderBy('id', 'desc')->paginate(10);
         $html = '';
         foreach ($products as $product) {
             if ($product->active == 0) {
@@ -349,8 +349,9 @@ class ProductController extends Controller
             $html .= '<td>' . number_format($product->price, 0, ',', '.') . ' VNĐ</td>';
             $html .= '<td>' . number_format($product->price_sale, 0, ',', '.') . ' VNĐ</td>';
             $html .= '<td>' . $product->qty . '</td>';
-            $html .= '<td><img src="' . $product->image . '" width="100px" >
-            <a href="/admin/products/editProductImage/' . $product->id . '">Ảnh</a></td>';
+            $html .= '<td><a href="' . $product->image  . '" target="_blank">
+            <img src="' . $product->image . '" width="100px" ></a><div>
+            <a href="/admin/products/editProductImage/' . $product->id . '">Sửa ảnh</a></div></td>';
             $html .= '<td>' . $htmlc . '</td>';
             $html .= '<td> <a class="btn btn-primary btn-sm" href="/admin/products/editProduct/' . $product->id . '"><i class="fas fa-edit"></i></a>';
             $html .= '<a class="btn btn-danger btn-sm" style="color:blue; cursor: pointer;" onclick="deleteProduct(' . $product->id . ')">';
@@ -363,9 +364,7 @@ class ProductController extends Controller
     }
     public function filter(Request $request)
     {
-
-
-        $products = DB::table('products')->where('active', $request->keyword)->paginate(5);
+        $products = DB::table('products')->where('active', $request->keyword)->get();
         $html = '';
         foreach ($products as $product) {
             if ($product->active == 0) {
@@ -383,8 +382,9 @@ class ProductController extends Controller
             $html .= '<td>' . number_format($product->price, 0, ',', '.') . ' VNĐ</td>';
             $html .= '<td>' . number_format($product->price_sale, 0, ',', '.') . ' VNĐ</td>';
             $html .= '<td>' . $product->qty . '</td>';
-            $html .= '<td><img src="' . $product->image . '" width="100px" >
-            <a href="/admin/products/editProductImage/' . $product->id . '">Ảnh</a></td>';
+            $html .= '<td><a href="' . $product->image  . '" target="_blank">
+            <img src="' . $product->image . '" width="100px" ></a><div>
+            <a href="/admin/products/editProductImage/' . $product->id . '">Sửa ảnh</a></div></td>';
             $html .= '<td>' . $htmlc . '</td>';
             $html .= '<td> <a class="btn btn-primary btn-sm" href="/admin/products/editProduct/' . $product->id . '"><i class="fas fa-edit"></i></a>';
             $html .= '<a class="btn btn-danger btn-sm" style="color:blue; cursor: pointer;" onclick="deleteProduct(' . $product->id . ')">';
