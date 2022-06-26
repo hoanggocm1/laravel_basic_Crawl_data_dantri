@@ -63,6 +63,7 @@ class sendFile extends Command
                 fputcsv($handle, $arr[$i]);
             }
             fclose($handle);
+
             $id = $arr[$a - 1]['id'];
         } while ($a == $limit);
     }
