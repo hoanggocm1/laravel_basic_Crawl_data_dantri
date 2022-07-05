@@ -11,10 +11,6 @@
         <nav class="main-header navbar navbar-expand navbar-white navbar-light">
             <!-- Left navbar links -->
             @include('admin.header')
-
-
-            <!-- Right navbar links -->
-
         </nav>
         <!-- /.navbar -->
 

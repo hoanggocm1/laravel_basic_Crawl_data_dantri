@@ -21,8 +21,7 @@
         <!-- Sidebar Menu -->
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-                <!-- Add icons to the links using the .nav-icon class
-                     with font-awesome or any other icon font library -->
+
                 <li class="nav-item">
                     <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-bars"></i>
@@ -71,6 +70,48 @@
                             </a>
                         </li>
 
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-bars"></i>
+                        <p>
+                            Danh mục bài đăng
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="/admin/category_posts/list" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Danh sách danh mục</p>
+                            </a>
+                        </li>
+
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-bars"></i>
+                        <p>
+                            Quản lý bài đăng
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="/admin/posts/carwl_dantri" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Crawl Data từ web dân trí</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="/admin/posts/list" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Danh sách bài đăng</p>
+                            </a>
+                        </li>
                     </ul>
                 </li>
 

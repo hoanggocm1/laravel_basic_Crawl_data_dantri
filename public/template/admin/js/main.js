@@ -325,3 +325,118 @@ function filter(keyword){
         }
     })
 }
+function categoryChanged(id){
+// console.log(id.value)
+id = id.value
+$.ajax({
+    type: 'get',
+    dataType: 'JSON',
+    url: '/admin/posts/filter_category_children',
+    data:{
+        id
+    },
+    success: function(result) {
+        // $('#div_category_children_post').css('display','block')
+ 
+        // console.log(result.countCategoryChildren)
+        html=''
+               for(i=0;i<result.countCategoryChildren;i++){
+                html+='<option value="'+result.category_children_post[i].name_slug+'">'+result.category_children_post[i].category_post_children_name+'</option>';
+                // console.log(result.category_children_post[i].category_post_children_name)
+               }
+              $('#category_children_post').html(html)
+    //    console.log(result.category_children_post[0].category_post_children_name)
+    // html=''
+    // result.category_children_post.forEach(item => {
+    //         console.log(item.name_slug)
+    //     });
+    }
+})
+}
+
+
+function filterPost(){
+   
+    var keyword = $('#category_children_post').val();
+    $.ajax({
+        type: 'get',
+        dataType: 'JSON',
+        url: '/admin/posts/filterPost',
+        data:{
+            keyword
+        },
+        success: function(result) {
+          var html=''
+                   for(i=0;i<result.countPost;i++){
+                    var status = ''
+                    if(result.Post[i].status == 1){
+                        status = 'Publish<label id="' + result.Post[i].id + '"   src="' + result.Post[i].status + '"  style="color: green;"></label>'
+                    }else{
+                        status = 'Unpublish<label id="' + result.Post[i].id  + '"   src="' + result.Post[i].status + '"  style="color: red;"></label>'
+                    }
+                    html +='<tr id="idPost_'+result.Post[i].id+'" ><td>'+result.Post[i].id+'</td><td>'+result.Post[i].title+'</td>'
+                    html +='<td><a href="'+result.Post[i].image_zoom_post+'" target="_blank">'
+                    html+='<img src="'+result.Post[i].image_zoom_post+'" alt="" width="100px"></a></td>'
+                    html +='<td><a href="'+result.Post[i].image_thumb_post+'" target="_blank">'
+                    html +='<img src="'+result.Post[i].image_thumb_post+'" alt="" width="100px"></a></td>'
+                    html +='<td>'+result.Post[i].parent_post_children_slug+'</td><td id="statusPost_'+result.Post[i].id+'">'+status+'<a onclick="updateStatus(' + result.Post[i].id  +  ','  + result.Post[i].status + ');">'
+                    html +='<i class="fas fa-retweet" style="color:blue; cursor: pointer;  align-items: center;" alt="' + result.Post[i].id  + '" ></i></a></td>'
+                    html +='<td>'+new Date(result.Post[i].created_at).toLocaleString('vi-VN', {timeZone: "UTC"})+'</td><td>'
+                   
+                    html +='<a style="cursor: pointer;color: red;" onclick="deletePost('+result.Post[i].id+')">Xóa </a>'
+                    html +='<a href="viewPost/'+result.Post[i].id+'" style="cursor: pointer; color: blue;"> Xem</a></td></tr>'
+                }
+                  $('#bodyListPost').html(html)
+        }
+    })
+}
+
+function updateStatus(id,status){
+    if(status == 1){
+        statusPost = 'Unpublish' 
+        idStatus = 2
+    }else{
+        statusPost = 'Publish' 
+        idStatus = 1
+    }
+ $.ajax({
+        type: 'POST',
+        dataType: 'JSON',
+        url: '/admin/posts/updateStatus',
+        data:{
+            id,status
+        },
+        success: function(result) {
+         if(result.code == 200){
+            statusPost +='<a onclick="updateStatus('+id+','+idStatus+');">'
+            statusPost +='<i class="fas fa-retweet" style="color:blue; cursor: pointer;  align-items: center;" alt="'+id+'"></i></a>'
+            $('#statusPost_'+id).html(statusPost)
+            $('#statusPostView_'+id).html(statusPost)
+             alert(result.message)
+         }
+                  
+        }
+    })
+}
+
+function deletePost(id){
+    check = confirm('Xác nhận xóa bài viết')
+    if(check){
+        $.ajax({
+            type: 'DELETE',
+            dataType: 'JSON',
+            url: '/admin/posts/deletePost',
+            data:{
+                id
+            },
+            success: function(result) {
+             if(result.code == 200){
+                 $('#idPost_'+result.id).remove()
+                 alert(result.message)
+             }
+                      
+            }
+        })
+    }
+    
+}

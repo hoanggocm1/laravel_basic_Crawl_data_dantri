@@ -1,7 +1,5 @@
 <?php
 
-use App\Http\Controllers\Admin\API\LoginController;
-use App\Http\Controllers\Admin\API\ProductController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 

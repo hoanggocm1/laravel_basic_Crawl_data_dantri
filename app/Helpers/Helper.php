@@ -38,6 +38,38 @@ class Helper
         }
         return $listMenu;
     }
+
+    public static function listCategoryPosts($list, $parent_id = 0, $char = '')
+    {
+        $listMenu = '';
+        foreach ($list as $key => $value) {
+            if ($value->active == 1) {
+                $activeMenu = '<label style="color: green;">On </label>';
+            } else {
+                $activeMenu = '<label style="color: red;">Off </label>';
+            }
+
+            if ($value->parent_id == $parent_id) {
+                $listMenu .= '<tr id="listMenu_' . $value->id . '">    
+                <td>' . $char . $value->name . '</td>
+                <td>'  . $value->description . '</td>
+                <td>' . $value->content . '</td>
+                <td>' . $activeMenu . '
+                <a href="/admin/menus/updateActive/' . $value->id . '">  
+                <i class="fas fa-retweet" ></i></a></td>
+                <td> 
+                    <a class"btn btn-primary btn-sm" href="/admin/menus/edit/' . $value->id . '">
+                    <i class="fas fa-edit"></i></a>
+                    <a class"btn btn-danger btn-sm" href="#"  onclick="removeMenu(' . $value->id . ' )">
+                    <i class="fas fa-trash"></i></a>
+                </td></tr>';
+                unset($list[$key]);
+                $listMenu .= self::listMenu($list, $value->id, $char . ' ---- || ');
+            }
+        }
+        return $listMenu;
+    }
+
     public static function listMenuProduct($menus, $parent_id = 0, $char = '')
     {
         $listMenu = '';

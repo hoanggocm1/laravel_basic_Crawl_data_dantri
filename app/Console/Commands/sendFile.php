@@ -50,21 +50,23 @@ class sendFile extends Command
         Storage::makeDirectory($pathBackup);
 
 
+
         do {
             $products = Product::orderBy('id', 'asc')->where('id', '>', $id)->limit($limit)->get();
-            $a = $products->count();
+            $count = $products->count();
             $arr = $products->toArray();
 
 
             $filename = 'storage/app/' . $pathBackup . "/File_Backup_Products_" . ++$dem . ".csv";
             $handle = fopen($filename, 'w');
             fputcsv($handle, array_keys($arr[0]));
-            for ($i = 0; $i < $a; $i++) {
+            for ($i = 0; $i < $count; $i++) {
                 fputcsv($handle, $arr[$i]);
             }
             fclose($handle);
 
-            $id = $arr[$a - 1]['id'];
-        } while ($a == $limit);
+
+            $id = $arr[$count - 1]['id'];
+        } while ($count == $limit);
     }
 }

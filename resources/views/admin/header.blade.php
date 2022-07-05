@@ -9,4 +9,9 @@
             <i class="fas fa-expand-arrows-alt"></i>
         </a>
     </li>
+    <li class="nav-item">
+        <a class="nav-link" href="/admin/logout" role="button">
+            Logout
+        </a>
+    </li>
 </ul>

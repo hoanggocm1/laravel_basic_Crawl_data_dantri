@@ -22,12 +22,27 @@ services:
       - default
     links: 
         - mysql
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    ports:
+      - 8080:80
+    environment:
+       PMA_HOST: mysql
+       PMA_PASSWORD: "Hoang123"
+    links: 
+        - mysql
+
   mysql:
     image: mysql:8.0.29
     environment:
       MYSQL_ROOT_PASSWORD: "Hoang123"
       MYSQL_USER: "Hoang"
-      MYSQL_DATABASE: "laravel_basic_4"
+      MYSQL_DATABASE: "laravel_basic"
       MYSQL_PASSWORD: "Hoang123"
+    networks:
+      - default
 networks:
   default:
+
+  
